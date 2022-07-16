@@ -41,12 +41,12 @@ function Workflow() {
       takeWorkFlow();
     }
       
-    const getWin = async () => {
-      const winner = await contract.methods.getWinner().call({ from: accounts[0] });
-      return (
-        <span>Le gagnant est {winner}</span>
-      )
-    }
+    // const getWin = async () => {
+    //   const winner = await contract.methods.getWinner().call({ from: accounts[0] });
+    //   return (
+    //     <span>Le gagnant est {winner}</span>
+    //   )
+    // }
     
       if (status === "0") {
         return (
@@ -118,22 +118,22 @@ function Workflow() {
 
       }
       
-      if (status === "5") {
-        return (
-          <div>
-            <p>
-              Vous êtes au status
-              {status}
-            </p>
-            <button onClick={getWin}>
-              Qui c qui a gagné
-            </button>
-            <p>
-              {getWin} 
-            </p>
-            </div>)
+      // if (status === "5") {
+      //   return (
+      //     <div>
+      //       <p>
+      //         Vous êtes au status
+      //         {status}
+      //       </p>
+      //       <button onClick={getWin}>
+      //         Qui c qui a gagné
+      //       </button>
+      //       <p>
+      //         {getWin} 
+      //       </p>
+      //       </div>)
 
-      }
+      // }
 
       
   }
