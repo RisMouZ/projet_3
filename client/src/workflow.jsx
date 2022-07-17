@@ -3,7 +3,7 @@ import { useState } from "react";
 
 function Workflow() {
   const { state: { contract, accounts, owned } } = useEth();
-  const [status, setStatus] = useState();
+  const [wfs, setStatus] = useState("");
   
   if (contract) {
     if (owned) {
@@ -48,12 +48,13 @@ function Workflow() {
     //   )
     // }
     
-      if (status === "0") {
+      if (wfs === "0") {
         return (
           <div>
             <p>
-              Vous êtes au status
-              {status}
+              Vous êtes au status 
+            <br/>
+              { wfs }
             </p>
             <button onClick={status1}>
               Status 1
@@ -62,12 +63,12 @@ function Workflow() {
 
       }
       
-      if (status === "1") {
+      if (wfs === "1") {
         return (
           <div>
             <p>
               Vous êtes au status
-              {status}
+              {wfs}
             </p>
             <button onClick={status2}>
               Status 2
@@ -76,12 +77,12 @@ function Workflow() {
 
       }
       
-      if (status === "2") {
+      if (wfs === "2") {
         return (
           <div>
             <p>
               Vous êtes au status
-              {status}
+              {wfs}
             </p>
             <button onClick={status3}>
               Status 3
@@ -90,12 +91,12 @@ function Workflow() {
 
       }
       
-      if (status === "3") {
+      if (wfs === "3") {
         return (
           <div>
             <p>
               Vous êtes au status
-              {status}
+              {wfs}
             </p>
             <button onClick={status4}>
               Status 4
@@ -104,12 +105,12 @@ function Workflow() {
 
       }
       
-      if (status === "4") {
+      if (wfs === "4") {
         return (
           <div>
             <p>
               Vous êtes au status
-              {status}
+              {wfs}
             </p>
             <button onClick={status5}>
               Status 5

@@ -34,7 +34,11 @@ contract Voting is Ownable {
         WorkflowStatus previousStatus,
         WorkflowStatus newStatus
     );
-    event ProposalRegistered(uint256 proposalId);
+    event ProposalRegistered(
+        uint256 proposalId,
+        string desc,
+        uint256 voteCount
+    );
     event Voted(address voter, uint256 proposalId);
 
     modifier flowStatus(WorkflowStatus _status) {
@@ -44,6 +48,30 @@ contract Voting is Ownable {
         );
         _;
     }
+
+    // ::::::::::::: GETTERS ::::::::::::: //
+
+    function getVoter(address _addr) external view returns (Voter memory) {
+        require(
+            voters[msg.sender].isRegistered,
+            "You are not allowed to get a voter"
+        );
+        return voters[_addr];
+    }
+
+    function getOneProposal(uint256 _id)
+        external
+        view
+        returns (Proposal memory)
+    {
+        require(
+            voters[msg.sender].isRegistered,
+            "You are not allowed to get a proposal"
+        );
+        return proposals[_id];
+    }
+
+    // ::::::::::::: REGISTRATION ::::::::::::: //
 
     function registerVoters(address _voterAddress)
         public
@@ -59,6 +87,8 @@ contract Voting is Ownable {
 
         emit VoterRegistered(_voterAddress);
     }
+
+    // ::::::::::::: PROPOSAL ::::::::::::: //
 
     function startProposalsRegistration()
         public
@@ -81,8 +111,15 @@ contract Voting is Ownable {
             "You are not allowed to make a proposal"
         );
 
+        require(
+            keccak256(abi.encode(proposalDescription)) !=
+                keccak256(abi.encode("")),
+            "You can't propose nothing"
+        );
+
         proposals.push(Proposal(proposalDescription, 0));
         voters[msg.sender].votedProposalId = proposals.length + 1;
+        emit ProposalRegistered(proposals.length - 1, proposalDescription, 0);
     }
 
     function endProposalsRegistration()
@@ -96,6 +133,8 @@ contract Voting is Ownable {
             WorkflowStatus.ProposalsRegistrationEnded
         );
     }
+
+    // ::::::::::::: VOTE ::::::::::::: //
 
     function startVotingSession()
         public

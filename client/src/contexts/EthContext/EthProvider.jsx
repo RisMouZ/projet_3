@@ -23,12 +23,12 @@ function EthProvider({ children }) {
         };
         const owner = await contract.methods.owner().call();
         let owned = accounts[0] === owner;
-
-        console.log(owned);
+        const status = await contract.methods.workflowStatus().call();
+        const voter = await contract.methods.getVoter(accounts[0]).call();
         
         dispatch({
           type: actions.init,
-          data: { artifact, web3, accounts, networkID, contract, owned }
+          data: { artifact, web3, accounts, networkID, contract, owned, status, voter }
         });
       }
     }, []);
