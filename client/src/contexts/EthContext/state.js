@@ -10,7 +10,6 @@ const initialState = {
   contract: null,
   owned: null,
   status: null,
-  voter: null,
 };
 
 const reducer = (state, action) => {

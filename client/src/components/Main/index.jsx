@@ -1,19 +1,22 @@
-import Array from "./voterArray";
-import Proposals from "./proposalsArray";
+// // import useEth from "../../contexts/EthContext/useEth";
+// import Array from "./voterArray";
+// import Proposals from "./proposalsArray";
 
-function Index () {
+
+// function Index() {
+//   // const { state: { contract, accounts } } = useEth();
   
 
-  return (
-    <div>
-      <div id="indexVoter">
-        <Array />
-      </div>
-      <div id="indexVoter">
-          <Proposals/>
-      </div>
-    </div>
-  )
-}
+//   return (
+//     <div>
+//       <div id="indexVoter">
+//         <Array />
+//       </div>
+//       <div id="indexVoter">
+//         <Proposals/>
+//       </div>
+//     </div>
+//   )
+// }
 
-export default Index;
+// export default Index;
