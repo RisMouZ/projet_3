@@ -1,7 +1,7 @@
 import useEth from "./contexts/EthContext/useEth";
 import { useState, useRef } from "react";
 
-function Workflow() {
+function Owner() {
   const { state: { contract, accounts, owned } } = useEth();
   let options = {
     fromBlock: 0,
@@ -24,7 +24,7 @@ function Workflow() {
   }
   
   if (contract) {
-
+    if (owned) {
       
                    // --------- LISTENERS --------- //
                               // VOTER //
@@ -40,15 +40,16 @@ function Workflow() {
       
                             // PROPOSALS //
       
-      contract.getPastEvents('ProposalRegistered', options)
-      .then((result) => {
-        result.map((addresse) => {
-          voterProp.push(addresse.returnValues);
-          setProposals(voterProp);
-        });
-    }).catch((err) => {
-      console.log(err);
-    });
+    //   contract.getPastEvents('ProposalRegistered', options)
+    //   .then((result) => {
+    //     result.map((addresse) => {
+    //       voterProp.push(addresse.returnValues);
+    //       setProposals(voterProp);
+    //       // console.log(result);
+    //     });
+    // }).catch((err) => {
+    //   console.log(err);
+    // });
       
                   // ------ GET WORKFLOWSTATUS ------ //
       
@@ -102,14 +103,14 @@ function Workflow() {
         <br />
         <br />
         <table>
-          <tbody>
-            {voters.map(voter => (
-              <tr key={voter.id}>
-                <td>{voter.voterAddress}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table> 
+                <tbody>
+                {voters.map(voter => (
+                  <tr key={voter.id}>
+                    <td>{voter.voterAddress}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table> 
 
         <br />
         <br />
@@ -119,9 +120,9 @@ function Workflow() {
             </button>
       </div>
       );
-    }
+      }else
       
-      if (status === "0") {
+      if (!owned && status === "0") {
         return (
           <div>
             <hr />
@@ -141,7 +142,7 @@ function Workflow() {
 
             </div>)
 
-      }
+      }else
       
       if (owned && status === "1") {
         return (
@@ -154,25 +155,8 @@ function Workflow() {
 
             <input type="text" placeholder="string" ref={inputProposals} />
             <button onClick={handleProposalsButtonClick}>Ajouter un proposition</button>
-            <br />
-            <br />
-            <br />
-            <table>
-                <thead>
-                  <th>ID</th>
-                  <th>Description</th>
-                  <th>Nombre de voix</th>
-                </thead>
-              <tbody>
-            {proposals.map(proposal => (
-              <tr key={proposal.id}>
-                <td>{proposal.proposalId}</td>
-                <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table> 
+{/*             
+            {proposals} */}
             <hr />
             <button onClick={status2}>
               Fin des propositions
@@ -191,10 +175,10 @@ function Workflow() {
             </details>
             </div>)
 
-      }
+      }else
 
       
-      if (status === "1") {
+      if (!owned && status === "1") {
         return (
           <div>
             <hr />
@@ -206,22 +190,7 @@ function Workflow() {
             <input type="text" placeholder="string" ref={inputProposals} />
             <button onClick={handleProposalsButtonClick}>Ajouter un proposition</button>
             
-            <table>
-                <thead>
-                  <th>ID</th>
-                  <th>Description</th>
-                  <th>Nombre de voix</th>
-                </thead>
-              <tbody>
-            {proposals.map(proposal => (
-              <tr key={proposal.id}>
-                <td>{proposal.proposalId}</td>
-                <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            {/* {proposals} */}
 
             <details>
             <summary>Liste des votants</summary>
@@ -237,15 +206,20 @@ function Workflow() {
             </details>
             </div>)
 
-      }
+      }else
       
       if (status === "2") {
         return (
           <div>
             <hr />
+            {/* {voter} */}
+            <hr />
             <p>
               Fin des propositions, le vote commence bientôt !
             </p>
+            <button onClick={status3}>
+              Début du vote
+            </button>
 
             <details>
             <summary>Liste des votants</summary>
@@ -259,32 +233,15 @@ function Workflow() {
                 </tbody>
               </table>      
             </details>
-            <details>
-              <summary>Tableau des propositions</summary>
-              <table>
-                <thead>
-                  <th>ID</th>
-                  <th>Description</th>
-                  <th>Nombre de voix</th>
-                </thead>
-              <tbody>
-            {proposals.map(proposal => (
-              <tr key={proposal.id}>
-                <td>{proposal.proposalId}</td>
-                <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-            </details>
             </div>)
 
-      }
+      }else
       
       if (status === "3") {
         return (
           <div>
+            <hr />
+            {/* {voter} */}
             <hr />
             <p>
               Votez !!!
@@ -305,32 +262,15 @@ function Workflow() {
                 </tbody>
               </table>      
             </details>
-            <details>
-              <summary>Tableau des propositions</summary>
-              <table>
-                <thead>
-                  <th>ID</th>
-                  <th>Description</th>
-                  <th>Nombre de voix</th>
-                </thead>
-              <tbody>
-            {proposals.map(proposal => (
-              <tr key={proposal.id}>
-                <td>{proposal.proposalId}</td>
-                <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-            </details>
             </div>)
 
-      }
+      }else
       
       if (status === "4") {
         return (
           <div>
+            <hr />
+            {/* {voter} */}
             <hr />
             <p>
               Fin des votes ! Merci à tous d'avoir participé ! <br />
@@ -352,25 +292,7 @@ function Workflow() {
                 </tbody>
               </table>      
             </details>
-            <details>
-              <summary>Tableau des propositions</summary>
-              <table>
-                <thead>
-                  <th>ID</th>
-                  <th>Description</th>
-                  <th>Nombre de voix</th>
-                </thead>
-              <tbody>
-            {proposals.map(proposal => (
-              <tr key={proposal.id}>
-                <td>{proposal.proposalId}</td>
-                <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-            </details>
+
             </div>)
 
       }
@@ -393,10 +315,10 @@ function Workflow() {
       // }
 
       
-  
+  }
   
   }
   
 }
 
-export default Workflow;
+export default Owner;

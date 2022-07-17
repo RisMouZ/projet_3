@@ -25,6 +25,7 @@ function EthProvider({ children }) {
         let owned = accounts[0] === owner;
         const status = await contract.methods.workflowStatus().call();
         
+        
         dispatch({
           type: actions.init,
           data: { artifact, web3, accounts, networkID, contract, owned, status }
