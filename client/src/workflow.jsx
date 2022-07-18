@@ -13,17 +13,18 @@ function Workflow() {
     fromBlock: 0
   };
 
-  let wfs = 0;
   let voterAdd = [];
   let voterProp = [];
-  let hasVoted = [];
-  const [status, setStatus] = useState("");
+  let resultProp = [];
+  const [status, setStatus] = useState("0");
   const [voters, setVoter] = useState([]);
   const [proposals, setProposals] = useState([]);
+  const [winner, setWinner] = useState();
+  const [proposalsFinal, setPropFinal] = useState([])
   const inputVoter = useRef(null);
   const inputProposals = useRef(null);
   const inputVoteId = useRef(null);
-  
+
   const handleVoterButtonClick = async () => {
     await contract.methods.registerVoters(inputVoter.current.value).send({ from: accounts[0] });
     setVoter(voterAdd);
@@ -38,6 +39,11 @@ function Workflow() {
     await contract.methods.vote(inputVoteId.current.value).send({ from: accounts[0] });
   }
 
+  const propRecap = async (e) => {
+    const recap = await contract.methods.getOneProposal(e).call({ from: accounts[0] });
+    resultProp.push(recap)
+  console.log(resultProp);
+  }
   
   // voterProp[event.returnValues.proposalId].voteCount + 1
 
@@ -116,12 +122,16 @@ function Workflow() {
       // takeWorkFlow();
     }
       
-    // const getWin = async () => {
-    //   const winner = await contract.methods.getWinner().call({ from: accounts[0] });
-    //   return (
-    //     <span>Le gagnant est {winner}</span>
-    //   )
-    // }
+    const getWin = async () => {
+      const whoWin = await contract.methods.getWinner().call({ from: accounts[0] });
+      setWinner(whoWin.description);
+      for (let i = 0; i < proposals.length; i++) {
+        propRecap(i);  
+      };
+      setPropFinal(resultProp)
+    }
+
+
     if (owned && status === "0") {
       return (<div>
         <hr />
@@ -553,22 +563,62 @@ function Workflow() {
 
       }
       
-      // if (status === "5") {
-      //   return (
-      //     <div>
-      //       <p>
-      //         Vous êtes au status
-      //         {status}
-      //       </p>
-      //       <button onClick={getWin}>
-      //         Qui c qui a gagné
-      //       </button>
-      //       <p>
-      //         {getWin} 
-      //       </p>
-      //       </div>)
+      if (owned && status === "5") {
+        return (
+          <div>
+            <p>
+              Vous êtes au status
+              {status}
+            </p>
+            <button onClick={getWin}>
+              Qui c qui a gagné
+            </button>
+            <br />
+            <p>Le gagnant est</p>
+            
+            {winner}
 
-      // }
+            <br />
+            <table>
+                <thead>
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Nombre de voix</th>
+                </thead>
+              <tbody>
+            {proposalsFinal.map(proposal => (
+              <tr key={proposal.id}>
+                <td>{proposal.description}</td>
+                <td>{proposal.voteCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+            
+            <p></p>
+            </div>)
+
+      }
+    
+      if (status === "5") {
+        return (
+          <div>
+            <p>
+              Vous êtes au status
+              {status}
+              </p>
+            <button onClick={getWin}>
+              Qui c qui a gagné
+            </button>
+            <br />
+            <p>Le gagnant est</p>
+            
+            {winner}
+            
+            <p></p>
+            </div>)
+
+      }
 
       
   

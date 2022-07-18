@@ -9,7 +9,7 @@ function App() {
       <div id="App" >
         <div className="container">
 
-          <Workflow/>
+          <Workflow />
 
         </div>
       </div>
