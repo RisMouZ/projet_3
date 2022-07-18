@@ -58,6 +58,7 @@ function Workflow() {
   
 
     // VOTER //
+
     contract.getPastEvents('VoterRegistered', options)
     .then((result) => {
       result.map((addresse) => {
@@ -95,8 +96,8 @@ function Workflow() {
       // };
       
       // takeWorkFlow();
-
-      
+  
+    
       const status1 = async () => {
       await contract.methods.startProposalsRegistration().send({ from: accounts[0] });
       // takeWorkFlow();
@@ -133,7 +134,10 @@ function Workflow() {
 
 
     if (owned && status === "0") {
-      return (<div>
+      return (
+        <div className="owner">
+
+        <div>
         <hr />
         <p>Enregistrement des votants</p>
         <hr />
@@ -159,11 +163,13 @@ function Workflow() {
               Lancer les propositions
             </button>
       </div>
+    </div>
       );
     }
       
       if (status === "0") {
         return (
+          <div className="user">
           <div>
             <hr />
             <p>
@@ -180,12 +186,16 @@ function Workflow() {
                 </tbody>
               </table> 
 
-            </div>)
+            </div>
+
+          </div>
+            )
 
       }
       
       if (owned && status === "1") {
         return (
+          <div className="owner">
           <div>
             <hr />
             <p>
@@ -230,13 +240,17 @@ function Workflow() {
                 </tbody>
               </table>      
             </details>
-            </div>)
+            </div>
+            </div>
+            )
 
       }
 
       
       if (status === "1") {
         return (
+          <div className="user">
+
           <div>
             <hr />
             <p>
@@ -276,12 +290,16 @@ function Workflow() {
                 </tbody>
               </table>      
             </details>
-            </div>)
+          </div>
+          </div>
+        )
 
       }
       
       if (owned && status === "2") {
         return (
+          <div className="owner">
+
           <div>
             <hr />
             <p>
@@ -322,12 +340,16 @@ function Workflow() {
           </tbody>
         </table>
             </details>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
     
       if (status === "2") {
         return (
+          <div className="user">
+
           <div>
             <hr />
             <p>
@@ -365,12 +387,16 @@ function Workflow() {
           </tbody>
         </table>
             </details>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
       
       if (owned && status === "3") {
         return (
+          <div className="owner">
+            
           <div>
             <hr />
             <p>
@@ -420,11 +446,15 @@ function Workflow() {
           </tbody>
         </table>
             </details>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
       if (status === "3") {
         return (
+          <div className="user">
+
           <div>
             <hr />
             <p>
@@ -468,12 +498,16 @@ function Workflow() {
           </tbody>
         </table>
             </details>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
       
       if (owned && status === "4") {
         return (
+          <div className="owner">
+
           <div>
             <hr />
             <p>
@@ -515,12 +549,16 @@ function Workflow() {
           </tbody>
         </table>
             </details>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
     
       if (status === "4") {
         return (
+          <div className="user">
+
           <div>
             <hr />
             <p>
@@ -559,17 +597,17 @@ function Workflow() {
           </tbody>
         </table>
             </details>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
       
       if (owned && status === "5") {
         return (
+          <div className="owner">
+
           <div>
-            <p>
-              Vous êtes au status
-              {status}
-            </p>
             <button onClick={getWin}>
               Qui c qui a gagné
             </button>
@@ -596,17 +634,17 @@ function Workflow() {
         </table>
             
             <p></p>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
     
       if (status === "5") {
         return (
+          <div className="user">
+
           <div>
-            <p>
-              Vous êtes au status
-              {status}
-              </p>
             <button onClick={getWin}>
               Qui c qui a gagné
             </button>
@@ -614,9 +652,28 @@ function Workflow() {
             <p>Le gagnant est</p>
             
             {winner}
+
+            <br />
+            <table>
+                <thead>
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Nombre de voix</th>
+                </thead>
+              <tbody>
+            {proposalsFinal.map(proposal => (
+              <tr key={proposal.id}>
+                <td>{proposal.description}</td>
+                <td>{proposal.voteCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
             
             <p></p>
-            </div>)
+            </div>
+          </div>
+        )
 
       }
 
