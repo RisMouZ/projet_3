@@ -16,11 +16,14 @@ function Workflow() {
   let voterAdd = [];
   let voterProp = [];
   let resultProp = [];
+  let voterVotedId = [];
   const [status, setStatus] = useState("0");
   const [voters, setVoter] = useState([]);
   const [proposals, setProposals] = useState([]);
+  const [hasVoted, setVoted] = useState(false)
   const [winner, setWinner] = useState();
   const [proposalsFinal, setPropFinal] = useState([])
+  const [votersFinal, setVoterFinal] = useState([])
   const inputVoter = useRef(null);
   const inputProposals = useRef(null);
   const inputVoteId = useRef(null);
@@ -37,18 +40,20 @@ function Workflow() {
   
   const handleVoteButtonClick = async () => {
     await contract.methods.vote(inputVoteId.current.value).send({ from: accounts[0] });
+    setVoted(true);
   }
 
   const propRecap = async (e) => {
     const recap = await contract.methods.getOneProposal(e).call({ from: accounts[0] });
-    resultProp.push(recap)
-  console.log(resultProp);
+    resultProp.push(recap);
   }
   
   // voterProp[event.returnValues.proposalId].voteCount + 1
 
   if (contract) {
     
+
+
     // --------- LISTENERS --------- //
 
     // WORKFLOW STATUS //
@@ -62,7 +67,7 @@ function Workflow() {
     contract.getPastEvents('VoterRegistered', options)
     .then((result) => {
       result.map((addresse) => {
-        voterAdd.push(addresse.returnValues);
+        voterAdd.push({ addr: addresse.returnValues.voterAddress });
         setVoter(voterAdd);
       });
     }).catch((err) => {
@@ -83,11 +88,16 @@ function Workflow() {
     
     // VOTE ID //
     
-    
-    // contract.events.Voted(options1)
-    // .on('data', event => console.log(voterProp[parseInt(event.returnValues.proposalId)]))
-    
-    
+    contract.events.Voted(options1)
+      .on('data', event => {
+        let addressVoter = event.returnValues.voter;
+        let voteId = event.returnValues.proposalId;
+        voterVotedId.push({ addr: addressVoter, id: voteId })
+        setVoterFinal(voterVotedId)
+      }
+        )  
+
+    // console.log(voterProp[parseInt(event.returnValues.proposalId)])
                   // ------ SET WORKFLOWSTATUS ------ //
       
       // const takeWorkFlow = async () => {
@@ -129,6 +139,7 @@ function Workflow() {
       for (let i = 0; i < proposals.length; i++) {
         propRecap(i);  
       };
+      resultProp.reverse();
       setPropFinal(resultProp)
     }
 
@@ -137,24 +148,27 @@ function Workflow() {
       return (
         <div className="owner">
 
-        <div>
-        <hr />
-        <p>Enregistrement des votants</p>
-        <hr />
+        <div className="vote">
+            <h1>
+        Enregistrement des votants
+        </h1>
         <input type="text" placeholder="address" ref={inputVoter} />
         <button onClick={handleVoterButtonClick}>Ajouter un voter</button>
         <br />
         <br />
         <br />
         <table>
-          <tbody>
-            {voters.map(voter => (
-              <tr key={voter.id}>
-                <td>{voter.voterAddress}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table> 
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
+                <tbody>
+                {voters.map(voter => (
+                  <tr key={voter.id}>
+                    <td>{voter.addr}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>
 
         <br />
         <br />
@@ -170,25 +184,25 @@ function Workflow() {
       if (status === "0") {
         return (
           <div className="user">
-          <div>
-            <hr />
-            <p>
-              Enregistrement des votants
-            </p>
-            <hr />
+            <div className="vote">
+
+          <h1>
+        Enregistrement des votants
+        </h1>
             <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table> 
-
-            </div>
-
+              </table>
           </div>
+                </div>
             )
 
       }
@@ -196,15 +210,13 @@ function Workflow() {
       if (owned && status === "1") {
         return (
           <div className="owner">
-          <div>
-            <hr />
-            <p>
+          <div className="vote">
+              <h1>
               Faites vos propositions !
-            </p>
-            <hr />
-
+            </h1>
+         
             <input type="text" placeholder="string" ref={inputProposals} />
-            <button onClick={handleProposalsButtonClick}>Ajouter un proposition</button>
+            <button onClick={handleProposalsButtonClick}>Ajouter une proposition</button>
             <br />
             <br />
             <br />
@@ -212,7 +224,6 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
@@ -224,17 +235,20 @@ function Workflow() {
             ))}
           </tbody>
         </table> 
-            <hr />
+            
             <button onClick={status2}>
               Fin des propositions
             </button>
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
@@ -251,21 +265,18 @@ function Workflow() {
         return (
           <div className="user">
 
-          <div>
-            <hr />
-            <p>
+          <div className="vote">
+          <h1>
               Faites vos propositions !
-            </p>
-            <hr />
+            </h1>
             
             <input type="text" placeholder="string" ref={inputProposals} />
-            <button onClick={handleProposalsButtonClick}>Ajouter un proposition</button>
+            <button onClick={handleProposalsButtonClick}>Ajouter une proposition</button>
             
             <table>
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
@@ -280,15 +291,18 @@ function Workflow() {
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table>      
+              </table>    
             </details>
           </div>
           </div>
@@ -300,26 +314,28 @@ function Workflow() {
         return (
           <div className="owner">
 
-          <div>
-            <hr />
-            <p>
+          <div className="vote">
+              <h1>
               Fin des propositions, le vote commence bientôt !
-            </p>
+            </h1>
             <button onClick={status3}>
               Début du vote
             </button>
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table>      
+              </table>    
             </details>
             <details>
               <summary>Tableau des propositions</summary>
@@ -327,7 +343,6 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
@@ -350,23 +365,25 @@ function Workflow() {
         return (
           <div className="user">
 
-          <div>
-            <hr />
-            <p>
+          <div className="vote">
+          <h1>
               Fin des propositions, le vote commence bientôt !
-            </p>
+            </h1>
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table>      
+              </table>     
             </details>
             <details>
               <summary>Tableau des propositions</summary>
@@ -374,7 +391,6 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
@@ -397,19 +413,17 @@ function Workflow() {
         return (
           <div className="owner">
             
-          <div>
-            <hr />
-            <p>
+          <div className="vote">
+            
+            <h1>
               Votez !!!
-            </p>
-            <br />
-            <br />
+            </h1>
+
             <label htmlFor="Vote">Choisissez votre proposition favorite</label>
             <br />
             <input type="number" placeholder="Id de la proposition" ref={inputVoteId} />
             <button onClick={handleVoteButtonClick}>Voter</button>
 
-            <hr />
 
             <button onClick={status4}>
               Fin du vote
@@ -417,15 +431,18 @@ function Workflow() {
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table>      
+              </table>     
             </details>
             <details>
               <summary>Tableau des propositions</summary>
@@ -433,14 +450,12 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
               <tr key={proposal.id}>
                 <td>{proposal.proposalId}</td>
                 <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
               </tr>
             ))}
           </tbody>
@@ -451,29 +466,83 @@ function Workflow() {
         )
 
       }
-      if (status === "3") {
+    
+      if (owned && hasVoted && status === "3") {
         return (
-          <div className="user">
-
-          <div>
-            <hr />
-            <p>
+          <div className="owner">
+            
+          <div className="vote">
+          <h1>
               Votez !!!
-            </p>
-            <br />
-            <br />
-            <label htmlFor="Vote">Choisissez votre proposition favorite</label>
-            <br />
-            <input type="number" placeholder="Id de la proposition" ref={inputVoteId} />
-            <button onClick={handleVoteButtonClick}>Voter</button>
+            </h1>
+              
+            <p>A voté !</p>
+
+
+
+            <button onClick={status4}>
+              Fin du vote
+            </button>
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>     
+            </details>
+            <details>
+              <summary>Tableau des propositions</summary>
+              <table>
+                <thead>
+                  <th>ID</th>
+                  <th>Description</th>
+                </thead>
+              <tbody>
+            {proposals.map(proposal => (
+              <tr key={proposal.id}>
+                <td>{proposal.proposalId}</td>
+                <td>{proposal.desc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+            </details>
+            </div>
+          </div>
+        )
+
+      }
+    
+      if (hasVoted && status === "3") {
+        return (
+          <div className="user">
+
+          <div className="vote">
+          <h1>
+              Votez !!!
+            </h1>
+            
+              <p>A voté !</p>
+
+            <details>
+            <summary>Liste des votants</summary>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
+                <tbody>
+                {voters.map(voter => (
+                  <tr key={voter.id}>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
@@ -485,14 +554,63 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
               <tr key={proposal.id}>
                 <td>{proposal.proposalId}</td>
                 <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+            </details>
+            </div>
+          </div>
+        )
+
+      }
+      
+      if (status === "3") {
+        return (
+          <div className="user">
+
+          <div className="vote">
+          <h1>
+              Votez !!!
+            </h1>
+            <label htmlFor="Vote">Choisissez votre proposition favorite</label>
+            <br />
+            <input type="number" placeholder="Id de la proposition" ref={inputVoteId} />
+            <button onClick={handleVoteButtonClick}>Voter</button>
+
+            <details>
+            <summary>Liste des votants</summary>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
+                <tbody>
+                {voters.map(voter => (
+                  <tr key={voter.id}>
+                    <td>{voter.addr}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>      
+            </details>
+            <details>
+              <summary>Tableau des propositions</summary>
+              <table>
+                <thead>
+                  <th>ID</th>
+                  <th>Description</th>
+                </thead>
+              <tbody>
+            {proposals.map(proposal => (
+              <tr key={proposal.id}>
+                <td>{proposal.proposalId}</td>
+                <td>{proposal.desc}</td>
               </tr>
             ))}
           </tbody>
@@ -508,27 +626,31 @@ function Workflow() {
         return (
           <div className="owner">
 
-          <div>
-            <hr />
-            <p>
+          <div className="vote">
+              <h1>
+                
               Fin des votes ! Merci à tous d'avoir participé ! <br />
               Les résultats seront bientôt en ligne
-            </p>
+            </h1>
+           
             <button onClick={status5}>
               Annoncer le vainqueur 
             </button>
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table>      
+              </table>  
             </details>
             <details>
               <summary>Tableau des propositions</summary>
@@ -536,14 +658,12 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
               <tr key={proposal.id}>
                 <td>{proposal.proposalId}</td>
                 <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
               </tr>
             ))}
           </tbody>
@@ -559,24 +679,27 @@ function Workflow() {
         return (
           <div className="user">
 
-          <div>
-            <hr />
-            <p>
-              Fin des votes ! Merci à tous d'avoir participé ! <br />
-              Les résultats seront bientôt en ligne
-            </p>
+          <div className="vote">
+          <h1>
+                
+                Fin des votes ! Merci à tous d'avoir participé ! <br />
+                Les résultats seront bientôt en ligne
+              </h1>
 
             <details>
             <summary>Liste des votants</summary>
-              <table>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                  </thead>
                 <tbody>
                 {voters.map(voter => (
                   <tr key={voter.id}>
-                    <td>{voter.voterAddress}</td>
+                    <td>{voter.addr}</td>
                   </tr>
                 ))}
                 </tbody>
-              </table>      
+              </table>     
             </details>
             <details>
               <summary>Tableau des propositions</summary>
@@ -584,14 +707,12 @@ function Workflow() {
                 <thead>
                   <th>ID</th>
                   <th>Description</th>
-                  <th>Nombre de voix</th>
                 </thead>
               <tbody>
             {proposals.map(proposal => (
               <tr key={proposal.id}>
                 <td>{proposal.proposalId}</td>
                 <td>{proposal.desc}</td>
-                <td>{proposal.voteCount}</td>
               </tr>
             ))}
           </tbody>
@@ -607,9 +728,9 @@ function Workflow() {
         return (
           <div className="owner">
 
-          <div>
+          <div className="vote">
             <button onClick={getWin}>
-              Qui c qui a gagné
+              Découvrir le gagnant
             </button>
             <br />
             <p>Le gagnant est</p>
@@ -619,7 +740,6 @@ function Workflow() {
             <br />
             <table>
                 <thead>
-                  <th>ID</th>
                   <th>Description</th>
                   <th>Nombre de voix</th>
                 </thead>
@@ -632,8 +752,24 @@ function Workflow() {
             ))}
           </tbody>
         </table>
+        <details>
+            <summary>Liste des votants</summary>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                    <th>ID du vote</th>
+                  </thead>
+                <tbody>
+                {votersFinal.map(voter => (
+                  <tr key={voter.id}>
+                    <td>{voter.addr}</td>
+                    <td>{voter.id}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>   
+            </details>
             
-            <p></p>
             </div>
           </div>
         )
@@ -644,10 +780,10 @@ function Workflow() {
         return (
           <div className="user">
 
-          <div>
+          <div className="vote">
             <button onClick={getWin}>
-              Qui c qui a gagné
-            </button>
+                Découvrir le gagnant
+              </button>
             <br />
             <p>Le gagnant est</p>
             
@@ -656,7 +792,6 @@ function Workflow() {
             <br />
             <table>
                 <thead>
-                  <th>ID</th>
                   <th>Description</th>
                   <th>Nombre de voix</th>
                 </thead>
@@ -669,7 +804,23 @@ function Workflow() {
             ))}
           </tbody>
         </table>
-            
+        <details>
+            <summary>Liste des votants</summary>
+            <table>
+                  <thead>
+                    <th>Adresse</th>
+                    <th>ID du vote</th>
+                  </thead>
+                <tbody>
+                {votersFinal.map(voter => (
+                  <tr key={voter.id}>
+                    <td>{voter.addr}</td>
+                    <td>{voter.id}</td>
+                  </tr>
+                ))}
+                </tbody>
+              </table>      
+            </details>
             <p></p>
             </div>
           </div>

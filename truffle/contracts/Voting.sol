@@ -51,14 +51,6 @@ contract Voting is Ownable {
 
     // ::::::::::::: GETTERS ::::::::::::: //
 
-    function getVoter(address _addr) external view returns (Voter memory) {
-        require(
-            voters[msg.sender].isRegistered,
-            "You are not allowed to get a voter"
-        );
-        return voters[_addr];
-    }
-
     function getOneProposal(uint256 _id)
         external
         view

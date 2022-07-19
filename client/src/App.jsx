@@ -8,26 +8,12 @@ function App() {
   return (
     
     <EthProvider>
-        <ul class="background">
-    <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-   <li></li>
-</ul>
+      
       <div id="App" >
 
         <div className="container">
           
           <Header/>
-          <hr />
           <Workflow />
 
         </div>
