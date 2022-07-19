@@ -13,3 +13,5 @@ Tous les fonction et event du contrat sont appelées dans l'app.
 Metamask étant en vrac depuis 3 jours la viédo dure presque 15min. Tu peux en sauter les 3/4.
 
 https://www.loom.com/share/3fda5d7fe6c641dbbb1b3a03cebb4094
+
+Le contrat est déployé sur ropsten et la dapp est en ligne 
