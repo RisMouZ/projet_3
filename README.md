@@ -4,7 +4,7 @@ Dans ce projet le but était de développer une dapp grâce à react et solidity
 
 ## Rendu
 
-J'ai fais en sorte que l'admin et les users n'est pas tout à fait les mêmes interfaces.
+J'ai fais en sorte que l'admin et les users n'ai pas tout à fait les mêmes interfaces.
 
 Tous les fonction et event du contrat sont appelées dans l'app.
 
